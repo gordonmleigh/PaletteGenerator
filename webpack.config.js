@@ -16,8 +16,8 @@ module.exports = (env, argv) => {
     devtool: isEnvDevelopment && "inline-source-map",
 
     entry: {
-      ui: "./src/ui.tsx",
-      plugin: "./src/plugin.ts",
+      ui: "./src/index.tsx",
+      plugin: "./src/host/index.ts",
     },
 
     module: {

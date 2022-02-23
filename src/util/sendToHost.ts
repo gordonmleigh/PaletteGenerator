@@ -1,5 +1,5 @@
-import { Message } from "../messages";
 import debug from "./debug";
+import { Message } from "./messages";
 
 const trace = debug("msg:ui");
 

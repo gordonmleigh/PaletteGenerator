@@ -2,8 +2,8 @@ import Color from "color";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { useEventListener } from "./hooks/useEventListener";
-import { Message, MessageType, PluginMessage } from "./messages";
 import "./styles.scss";
+import { Message, MessageType, PluginMessage } from "./util/messages";
 import { sendToHost } from "./util/sendToHost";
 
 interface PaletteColorState {

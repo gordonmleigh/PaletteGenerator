@@ -1,4 +1,4 @@
-import { Palette } from "./util/getPaletteStyles";
+import { Palette } from "./getPaletteStyles";
 
 export interface PluginMessage<T> {
   pluginMessage: T;

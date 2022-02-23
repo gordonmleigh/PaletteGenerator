@@ -1,6 +1,6 @@
-import { Message, MessageType } from "./messages";
-import { getPaletteStyles } from "./util/getPaletteStyles";
-import { sendToUI } from "./util/sendToUI";
+import { getPaletteStyles } from "../util/getPaletteStyles";
+import { Message, MessageType } from "../util/messages";
+import { sendToUI } from "../util/sendToUI";
 
 figma.showUI(__html__, {
   height: 25 * 16,
