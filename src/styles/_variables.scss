@@ -1,0 +1,38 @@
+$font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+  helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+
+$lengths: (
+  "xs": 0.125rem,
+  "sm": 0.25rem,
+  "md": 0.5rem,
+  "lg": 1rem,
+  "xl": 2rem,
+  "hg": 3rem,
+  "xh": 4rem,
+);
+
+$font-sizes: (
+  "sm": 10px,
+  "md": 12px,
+  "lg": 16px,
+  "xl": 19px,
+  "hg": 24px,
+);
+
+$font-weights: (
+  "normal": 400,
+  "bold": 600,
+);
+
+$line-heights: (
+  "sm": 16px,
+  "md": 20px,
+  "lg": 24px,
+  "xl": 28px,
+  "hg": 36px,
+);
+
+$text-color-minor: #999;
+
+$bg-color-default: #fff;
+$hover-bg-color: #f0f0f0;

@@ -1,0 +1,20 @@
+@use "sass:map";
+@use "variables" as v;
+
+@each $name, $value in v.$font-sizes {
+  .type-#{$name} {
+    font-family: v.$font-family;
+    font-size: $value;
+    line-height: map.get(v.$line-heights, $name);
+  }
+}
+
+@each $name, $value in v.$font-weights {
+  .type-#{$name} {
+    font-weight: $value;
+  }
+}
+
+.type-color-minor {
+  color: v.$text-color-minor;
+}

@@ -1,0 +1,121 @@
+@use "variables" as v;
+
+@each $name, $value in v.$lengths {
+  .mb-#{$name} {
+    margin-bottom: $value;
+  }
+  .ml-#{$name} {
+    margin-left: $value;
+  }
+  .mr-#{$name} {
+    margin-right: $value;
+  }
+  .mt-#{$name} {
+    margin-top: $value;
+  }
+  .mx-#{$name} {
+    margin-left: $value;
+    margin-right: $value;
+  }
+  .my-#{$name} {
+    margin-bottom: $value;
+    margin-top: $value;
+  }
+  .m-#{$name} {
+    margin: $value;
+  }
+}
+
+@each $name, $value in v.$lengths {
+  .pb-#{$name} {
+    padding-bottom: $value;
+  }
+  .pl-#{$name} {
+    padding-left: $value;
+  }
+  .pr-#{$name} {
+    padding-right: $value;
+  }
+  .pt-#{$name} {
+    padding-top: $value;
+  }
+  .px-#{$name} {
+    padding-left: $value;
+    padding-right: $value;
+  }
+  .py-#{$name} {
+    padding-bottom: $value;
+    padding-top: $value;
+  }
+  .p-#{$name} {
+    padding: $value;
+  }
+}
+
+@each $name, $value in v.$lengths {
+  .square-#{$name} {
+    height: $value;
+    width: $value;
+  }
+  .h-#{$name} {
+    height: $value;
+  }
+  .w-#{$name} {
+    width: $value;
+  }
+}
+
+.stack-col {
+  display: flex;
+  flex-direction: column;
+
+  @each $name, $value in v.$lengths {
+    &.gap-#{$name} {
+      row-gap: $value;
+    }
+  }
+}
+
+.stack-row {
+  display: flex;
+  flex-direction: row;
+
+  @each $name, $value in v.$lengths {
+    &.gap-#{$name} {
+      column-gap: $value;
+    }
+  }
+}
+
+.stack-align-center {
+  align-items: center;
+}
+
+.stack-stretch {
+  align-items: stretch;
+}
+
+.stack-equal-lengths {
+  & > * {
+    flex-grow: 1;
+  }
+}
+
+@each $name, $value in v.$lengths {
+  .col-gap-#{$name} {
+    column-gap: $value;
+  }
+  .row-gap-#{$name} {
+    row-gap: $value;
+  }
+}
+
+@each $n in 0, 1, 2, 3, 4 {
+  .stack-grow-#{$n} {
+    flex-grow: $n;
+  }
+
+  .stack-shrink-#{$n} {
+    flex-shrink: $n;
+  }
+}

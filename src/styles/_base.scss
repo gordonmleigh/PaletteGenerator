@@ -1,0 +1,26 @@
+@use "sass:map";
+@use "typography" as *;
+@use "variables" as v;
+
+body {
+  @extend .type-md;
+  @extend .type-normal;
+}
+
+h1 {
+  @extend .type-hg;
+  @extend .type-bold;
+  margin: 0;
+}
+
+h2 {
+  @extend .type-xl;
+  @extend .type-bold;
+  margin: 0;
+}
+
+h3 {
+  @extend .type-lg;
+  @extend .type-bold;
+  margin: 0;
+}
