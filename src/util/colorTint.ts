@@ -7,5 +7,9 @@ export function colorTint(
   ratio: number,
   { lightenRatio = 1 }: { lightenRatio?: number } = {}
 ): Color {
-  return color.lighten(lightenRatio * ratio).mix(white, ratio);
+  const hsl = color.lightness(
+    color.lightness() + (100 - color.lightness()) * ratio
+  );
+  const rgb = color.mix(white, ratio);
+  return rgb.mix(hsl, lightenRatio);
 }
