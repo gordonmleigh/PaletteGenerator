@@ -2,7 +2,6 @@
 const HtmlInlineScriptPlugin = require("html-inline-script-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
-const webpack = require("webpack");
 const postcssNormalize = require("postcss-normalize");
 
 module.exports = (env, argv) => {
@@ -95,7 +94,8 @@ module.exports = (env, argv) => {
               // Also exclude `html` and `json` extensions so they get processed
               // by webpacks internal loaders.
               exclude: [/^$/, /\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
-              type: "asset/resource",
+              // all assets need to be inline for Figma plugins
+              type: "asset/inline",
             },
           ],
         },

@@ -1,20 +1,13 @@
 import Color from "color";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import { ColorModal } from "./components/ColorModal";
 import { useEventListener } from "./hooks/useEventListener";
+import { PaletteColorState } from "./state/PaletteColorState";
+import { PaletteState } from "./state/PaletteState";
 import "./styles.scss";
 import { Message, MessageType, PluginMessage } from "./util/messages";
 import { sendToHost } from "./util/sendToHost";
-
-interface PaletteColorState {
-  name: string;
-  stops: Record<string, Color>;
-  value: Color;
-}
-
-interface PaletteState {
-  colors: PaletteColorState[];
-}
 
 function App() {
   const [palette, setPalette] = useState<PaletteState>();
@@ -43,9 +36,35 @@ function App() {
     });
   }, []);
 
+  function save(color: PaletteColorState) {
+    const existing = palette?.colors.find((x) => x.name === color.name);
+    if (!existing) {
+      return;
+    }
+    const deletes: string[] = [];
+
+    for (const key in existing.stops) {
+      if (!color.stops[key]) {
+        deletes.push(`${color.name}/${key}`);
+      }
+    }
+
+    sendToHost({
+      type: MessageType.UpdatePalette,
+      delete: deletes,
+      update: Object.fromEntries(
+        Object.entries(color.stops).map(([k, v]) => [
+          `${color.name}/${k}`,
+          v.unitObject(),
+        ])
+      ),
+    });
+    setSelectedColor(undefined);
+  }
+
   return (
-    <div>
-      <div className="stack-col py-md">
+    <>
+      <div className="box-modal box-scroll-y stack-col py-md">
         {palette &&
           palette.colors.map(({ name, stops: stopMap, value }, i) => {
             const stops = Object.entries(stopMap);
@@ -55,11 +74,11 @@ function App() {
             return (
               <div
                 key={name}
-                className="stack-row stack-stretch gap-md p-md px-lg bg-hover clickable"
+                className="stack-row col-gap-md p-md px-lg bg-hover clickable"
                 onClick={() => setSelectedColor(i)}
               >
                 <div
-                  className="square-hg stack-grow-0 stack-shrink-0"
+                  className="square-hg grow-0 shrink-0"
                   style={{ backgroundColor: value.toString() }}
                 />
                 <div className="stack-col stack-equal-lengths">
@@ -76,7 +95,7 @@ function App() {
                         ></div>
                       ))}
                   </div>
-                  <div className="stack-row stack-align-center gap-sm">
+                  <div className="stack-row stack-row-center col-gap-sm">
                     <div>{name}</div>
                     <div className="type-color-minor">({stopCount})</div>
                   </div>
@@ -88,19 +107,14 @@ function App() {
             );
           })}
       </div>
-      {selectedColor !== undefined && (
-        <div className="box-modal bg-default">
-          <div className="stack-col stack-stretch">
-            <div className="h-xl stack-row stack-stretch">
-              <div className="grow-1"></div>
-              <div className="shrink-1 w-xl">
-                <i className="fa-solid fa-xmark" />
-              </div>
-            </div>
-          </div>
-        </div>
+      {palette && selectedColor !== undefined && (
+        <ColorModal
+          color={palette.colors[selectedColor]}
+          onClose={() => setSelectedColor(undefined)}
+          onSave={save}
+        />
       )}
-    </div>
+    </>
   );
 }
 

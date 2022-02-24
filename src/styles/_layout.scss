@@ -1,6 +1,17 @@
 @use "variables" as v;
 
 @each $name, $value in v.$lengths {
+  .m-#{$name} {
+    margin: $value;
+  }
+  .mx-#{$name} {
+    margin-left: $value;
+    margin-right: $value;
+  }
+  .my-#{$name} {
+    margin-bottom: $value;
+    margin-top: $value;
+  }
   .mb-#{$name} {
     margin-bottom: $value;
   }
@@ -13,20 +24,20 @@
   .mt-#{$name} {
     margin-top: $value;
   }
-  .mx-#{$name} {
-    margin-left: $value;
-    margin-right: $value;
-  }
-  .my-#{$name} {
-    margin-bottom: $value;
-    margin-top: $value;
-  }
-  .m-#{$name} {
-    margin: $value;
-  }
 }
 
 @each $name, $value in v.$lengths {
+  .p-#{$name} {
+    padding: $value;
+  }
+  .px-#{$name} {
+    padding-left: $value;
+    padding-right: $value;
+  }
+  .py-#{$name} {
+    padding-bottom: $value;
+    padding-top: $value;
+  }
   .pb-#{$name} {
     padding-bottom: $value;
   }
@@ -38,17 +49,6 @@
   }
   .pt-#{$name} {
     padding-top: $value;
-  }
-  .px-#{$name} {
-    padding-left: $value;
-    padding-right: $value;
-  }
-  .py-#{$name} {
-    padding-bottom: $value;
-    padding-top: $value;
-  }
-  .p-#{$name} {
-    padding: $value;
   }
 }
 
@@ -69,10 +69,47 @@
   display: flex;
   flex-direction: column;
 
-  @each $name, $value in v.$lengths {
-    &.gap-#{$name} {
-      row-gap: $value;
-    }
+  .stack-row-start {
+    align-items: flex-start;
+  }
+  .stack-row-center {
+    align-items: center;
+  }
+  .stack-row-fill {
+    align-items: stretch;
+  }
+  .stack-row-space-around {
+    align-content: space-around;
+  }
+  .stack-row-space-between {
+    align-content: space-between;
+  }
+  .stack-row-space-evenly {
+    align-content: space-evenly;
+  }
+  .stack-row-end {
+    align-items: flex-end;
+  }
+  .stack-col-start {
+    justify-content: flex-start;
+  }
+  .stack-col-center {
+    justify-content: center;
+  }
+  .stack-col-fill {
+    justify-content: stretch;
+  }
+  .stack-col-space-around {
+    justify-content: space-around;
+  }
+  .stack-col-space-between {
+    justify-content: space-between;
+  }
+  .stack-col-space-evenly {
+    justify-content: space-evenly;
+  }
+  .stack-col-end {
+    justify-content: flex-end;
   }
 }
 
@@ -80,19 +117,57 @@
   display: flex;
   flex-direction: row;
 
-  @each $name, $value in v.$lengths {
-    &.gap-#{$name} {
-      column-gap: $value;
-    }
+  .stack-col-start {
+    align-items: flex-start;
+  }
+  .stack-col-center {
+    align-items: center;
+  }
+  .stack-col-fill {
+    align-items: stretch;
+  }
+  .stack-col-space-around {
+    align-content: space-around;
+  }
+  .stack-col-space-between {
+    align-content: space-between;
+  }
+  .stack-col-space-evenly {
+    align-content: space-evenly;
+  }
+  .stack-col-end {
+    align-items: flex-end;
+  }
+  .stack-row-start {
+    justify-content: flex-start;
+  }
+  .stack-row-center {
+    justify-content: center;
+  }
+  .stack-row-fill {
+    justify-content: stretch;
+  }
+  .stack-row-space-around {
+    justify-content: space-around;
+  }
+  .stack-row-space-between {
+    justify-content: space-between;
+  }
+  .stack-row-space-evenly {
+    justify-content: space-evenly;
+  }
+  .stack-row-end {
+    justify-content: flex-end;
   }
 }
 
-.stack-align-center {
-  align-items: center;
-}
-
-.stack-stretch {
-  align-items: stretch;
+@each $name, $value in v.$lengths {
+  .col-gap-#{$name} {
+    column-gap: $value;
+  }
+  .row-gap-#{$name} {
+    row-gap: $value;
+  }
 }
 
 .stack-equal-lengths {
@@ -111,11 +186,11 @@
 }
 
 @each $n in 0, 1, 2, 3, 4 {
-  .stack-grow-#{$n} {
+  .grow-#{$n} {
     flex-grow: $n;
   }
 
-  .stack-shrink-#{$n} {
+  .shrink-#{$n} {
     flex-shrink: $n;
   }
 }

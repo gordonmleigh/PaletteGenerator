@@ -349,3 +349,13 @@ template {
 [hidden] {
   display: none;
 }
+
+/*** Custom resets ***/
+
+button {
+  border: 0 none;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+  outline: none;
+}
