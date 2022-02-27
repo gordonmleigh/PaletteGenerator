@@ -3,7 +3,7 @@ import { rgbFromCss } from "./rgbFromCss";
 export function createOrUpdatePaintStyle(
   name: string,
   ...colors: (RGB | string)[]
-): void {
+): PaintStyle {
   let style = figma.getLocalPaintStyles().find((x) => x.name === name);
   if (!style) {
     style = figma.createPaintStyle();
@@ -15,4 +15,5 @@ export function createOrUpdatePaintStyle(
       type: "SOLID",
     })
   );
+  return style;
 }

@@ -65,50 +65,63 @@
   }
 }
 
+.stack-equal-lengths {
+  & > * {
+    flex-basis: 0;
+    flex-grow: 1;
+    flex-shrink: 0;
+  }
+}
+
+.basis-0 {
+  flex-basis: 0;
+  min-height: 0;
+}
+
 .stack-col {
   display: flex;
   flex-direction: column;
 
-  .stack-row-start {
+  &.stack-col-start {
     align-items: flex-start;
   }
-  .stack-row-center {
+  &.stack-col-center {
     align-items: center;
   }
-  .stack-row-fill {
+  &.stack-col-fill {
     align-items: stretch;
   }
-  .stack-row-space-around {
+  &.stack-col-space-around {
     align-content: space-around;
   }
-  .stack-row-space-between {
+  &.stack-col-space-between {
     align-content: space-between;
   }
-  .stack-row-space-evenly {
+  &.stack-col-space-evenly {
     align-content: space-evenly;
   }
-  .stack-row-end {
+  &.stack-col-end {
     align-items: flex-end;
   }
-  .stack-col-start {
+  &.stack-row-start {
     justify-content: flex-start;
   }
-  .stack-col-center {
+  &.stack-row-center {
     justify-content: center;
   }
-  .stack-col-fill {
+  &.stack-row-fill {
     justify-content: stretch;
   }
-  .stack-col-space-around {
+  &.stack-row-space-around {
     justify-content: space-around;
   }
-  .stack-col-space-between {
+  &.stack-row-space-between {
     justify-content: space-between;
   }
-  .stack-col-space-evenly {
+  &.stack-row-space-evenly {
     justify-content: space-evenly;
   }
-  .stack-col-end {
+  &.stack-row-end {
     justify-content: flex-end;
   }
 }
@@ -117,63 +130,58 @@
   display: flex;
   flex-direction: row;
 
-  .stack-col-start {
+  &.stack-row-start {
     align-items: flex-start;
   }
-  .stack-col-center {
+  &.stack-row-center {
     align-items: center;
   }
-  .stack-col-fill {
+  &.stack-row-fill {
     align-items: stretch;
   }
-  .stack-col-space-around {
+  &.stack-row-space-around {
     align-content: space-around;
   }
-  .stack-col-space-between {
+  &.stack-row-space-between {
     align-content: space-between;
   }
-  .stack-col-space-evenly {
+  &.stack-row-space-evenly {
     align-content: space-evenly;
   }
-  .stack-col-end {
+  &.stack-row-end {
     align-items: flex-end;
   }
-  .stack-row-start {
+  &.stack-col-start {
     justify-content: flex-start;
   }
-  .stack-row-center {
+  &.stack-col-center {
     justify-content: center;
   }
-  .stack-row-fill {
+  &.stack-col-fill {
     justify-content: stretch;
   }
-  .stack-row-space-around {
+  &.stack-col-space-around {
     justify-content: space-around;
   }
-  .stack-row-space-between {
+  &.stack-col-space-between {
     justify-content: space-between;
   }
-  .stack-row-space-evenly {
+  &.stack-col-space-evenly {
     justify-content: space-evenly;
   }
-  .stack-row-end {
+  &.stack-col-end {
     justify-content: flex-end;
   }
 }
 
-@each $name, $value in v.$lengths {
-  .col-gap-#{$name} {
-    column-gap: $value;
-  }
-  .row-gap-#{$name} {
-    row-gap: $value;
-  }
+.stack-nowrap {
+  flex-wrap: nowrap;
 }
-
-.stack-equal-lengths {
-  & > * {
-    flex-grow: 1;
-  }
+.stack-wrap-reverse {
+  flex-wrap: wrap-reverse;
+}
+.stack-wrap {
+  flex-wrap: wrap;
 }
 
 @each $name, $value in v.$lengths {
@@ -185,7 +193,16 @@
   }
 }
 
-@each $n in 0, 1, 2, 3, 4 {
+@each $name, $value in v.$lengths {
+  .col-gap-#{$name} {
+    column-gap: $value;
+  }
+  .row-gap-#{$name} {
+    row-gap: $value;
+  }
+}
+
+@each $n in 0, 1, 2, 3, 4, 5 {
   .grow-#{$n} {
     flex-grow: $n;
   }

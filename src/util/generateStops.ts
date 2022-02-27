@@ -7,17 +7,19 @@ export function generateStops(
   {
     addStop950,
     addStop990,
+    darkenRatio,
     lightenRatio = 1,
   }: {
     addStop950?: boolean;
     addStop990?: boolean;
+    darkenRatio?: number;
     lightenRatio?: number;
   } = {}
 ): Record<string, Color> {
   const colors: Record<string, Color> = {};
 
   for (let i = 1; i <= 4; ++i) {
-    colors[`${i}00`] = colorShade(center, i / 5);
+    colors[`${i}00`] = colorShade(center, 1 - i / 5, { darkenRatio });
   }
 
   colors["500"] = center;

@@ -1,4 +1,5 @@
-import { Palette, PaletteColour } from "./getPaletteStyles";
+import { Palette } from "./Palette";
+import { PaletteColor } from "./PaletteColor";
 
 export interface PluginMessage<T> {
   pluginMessage: T;
@@ -16,13 +17,14 @@ export interface RequestPaletteMessage {
 
 export interface SendPaletteMessage {
   type: MessageType.SendPalette;
-  palette: Palette;
+  palette: Palette<string>;
 }
 
 export interface UpdatePaletteMessage {
   type: MessageType.UpdatePalette;
   delete?: string[];
-  update?: PaletteColour;
+  name: string;
+  update?: PaletteColor<string>;
 }
 
 export type Message =

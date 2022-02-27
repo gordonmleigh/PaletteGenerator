@@ -1,31 +1,27 @@
 import Color from "color";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { ColorModal } from "./components/ColorModal";
+import { GenerateModal } from "./components/GenerateModal";
 import { useEventListener } from "./hooks/useEventListener";
-import { PaletteColorState } from "./state/PaletteColorState";
-import { PaletteState } from "./state/PaletteState";
+import {
+  deserializePalette,
+  serializePaletteColor,
+} from "./host/serializePalette";
 import "./styles.scss";
 import { Message, MessageType, PluginMessage } from "./util/messages";
+import { Palette } from "./util/Palette";
+import { PaletteColor } from "./util/PaletteColor";
 import { sendToHost } from "./util/sendToHost";
 
 function App() {
-  const [palette, setPalette] = useState<PaletteState>();
+  const [palette, setPalette] = useState<Palette>();
   const [selectedColor, setSelectedColor] = useState<number>();
 
   useEventListener("message", (e: MessageEvent<PluginMessage<Message>>) => {
     const msg = e.data.pluginMessage;
     switch (msg.type) {
       case MessageType.SendPalette:
-        const colors = Object.entries(msg.palette).map(([name, value]) => ({
-          name,
-          stops: Object.fromEntries(
-            Object.entries(value).map(([k, v]) => [k, Color(v)])
-          ),
-          value: Color(value["500"]),
-        }));
-        colors.sort((a, b) => a.name.localeCompare(b.name));
-        setPalette({ colors });
+        setPalette(deserializePalette(msg.palette));
         break;
     }
   });
@@ -36,28 +32,20 @@ function App() {
     });
   }, []);
 
-  function save(color: PaletteColorState) {
-    const existing = palette?.colors.find((x) => x.name === color.name);
-    if (!existing) {
-      return;
-    }
+  function save(color: PaletteColor, newStops: Record<string, Color>) {
     const deletes: string[] = [];
 
-    for (const key in existing.stops) {
-      if (!color.stops[key]) {
-        deletes.push(`${color.name}/${key}`);
+    for (const key in color.stops) {
+      if (!newStops[key]) {
+        deletes.push(key);
       }
     }
 
     sendToHost({
       type: MessageType.UpdatePalette,
       delete: deletes,
-      update: Object.fromEntries(
-        Object.entries(color.stops).map(([k, v]) => [
-          `${color.name}/${k}`,
-          v.unitObject(),
-        ])
-      ),
+      name: color.name,
+      update: serializePaletteColor({ ...color, stops: newStops }),
     });
     setSelectedColor(undefined);
   }
@@ -66,7 +54,7 @@ function App() {
     <>
       <div className="box-modal box-scroll-y stack-col py-md">
         {palette &&
-          palette.colors.map(({ name, stops: stopMap, value }, i) => {
+          palette.colors.map(({ name, stops: stopMap, center }, i) => {
             const stops = Object.entries(stopMap);
             const stopCount =
               stops.length === 1 ? `1 stop` : `${stops.length} stops`;
@@ -79,7 +67,7 @@ function App() {
               >
                 <div
                   className="square-hg grow-0 shrink-0"
-                  style={{ backgroundColor: value.toString() }}
+                  style={{ backgroundColor: center.toString() }}
                 />
                 <div className="stack-col stack-equal-lengths">
                   <div className="stack-row">
@@ -95,12 +83,12 @@ function App() {
                         ></div>
                       ))}
                   </div>
-                  <div className="stack-row stack-row-center col-gap-sm">
+                  <div className="stack-row stack-col-center col-gap-sm">
                     <div>{name}</div>
                     <div className="type-color-minor">({stopCount})</div>
                   </div>
                   <div className="stack-row stack-align-center">
-                    {value.hex().toString()}
+                    {center.hex().toString()}
                   </div>
                 </div>
               </div>
@@ -108,10 +96,10 @@ function App() {
           })}
       </div>
       {palette && selectedColor !== undefined && (
-        <ColorModal
+        <GenerateModal
           color={palette.colors[selectedColor]}
-          onClose={() => setSelectedColor(undefined)}
-          onSave={save}
+          onCancel={() => setSelectedColor(undefined)}
+          onSave={(stops) => save(palette.colors[selectedColor], stops)}
         />
       )}
     </>

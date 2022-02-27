@@ -35,3 +35,25 @@
 .bg-hover:hover {
   background-color: v.$hover-bg-color;
 }
+
+.bt {
+  border-top: solid 1px v.$border-color;
+}
+.br {
+  border-right: solid 1px v.$border-color;
+}
+.bb {
+  border-bottom: solid 1px v.$border-color;
+}
+.bl {
+  border-left: solid 1px v.$border-color;
+}
+.bx {
+  @extend .bl, .br;
+}
+.by {
+  @extend .bt, .bb;
+}
+.b {
+  @extend .bx, .by;
+}

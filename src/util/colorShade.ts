@@ -1,5 +1,13 @@
 import Color from "color";
 
-export function colorShade(color: Color, ratio: number): Color {
-  return color.darken(1 - ratio);
+const black = Color("#000");
+
+export function colorShade(
+  color: Color,
+  ratio: number,
+  { darkenRatio = 1 }: { darkenRatio?: number } = {}
+): Color {
+  const hsl = color.darken(ratio);
+  const rgb = color.mix(black, ratio);
+  return rgb.mix(hsl, darkenRatio);
 }
