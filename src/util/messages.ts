@@ -6,9 +6,15 @@ export interface PluginMessage<T> {
 }
 
 export enum MessageType {
+  DrawChips = "DrawChips",
   RequestPalette = "RequestPalette",
   SendPalette = "SendPalette",
   UpdatePalette = "UpdatePalette",
+}
+
+export interface DrawChipsMessage {
+  type: MessageType.DrawChips;
+  color: PaletteColor<string>;
 }
 
 export interface RequestPaletteMessage {
@@ -28,6 +34,7 @@ export interface UpdatePaletteMessage {
 }
 
 export type Message =
+  | DrawChipsMessage
   | RequestPaletteMessage
   | SendPaletteMessage
   | UpdatePaletteMessage;

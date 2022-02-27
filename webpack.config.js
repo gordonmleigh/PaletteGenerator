@@ -15,8 +15,8 @@ module.exports = (env, argv) => {
     devtool: isEnvDevelopment && "inline-source-map",
 
     entry: {
-      ui: "./src/index.tsx",
-      plugin: "./src/host/index.ts",
+      ui: ["regenerator-runtime/runtime", "./src/index.tsx"],
+      plugin: ["regenerator-runtime/runtime", "./src/host/index.ts"],
     },
 
     module: {

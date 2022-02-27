@@ -1,11 +1,14 @@
 import clsx from "clsx";
 import Color from "color";
 import React, { useEffect, useMemo, useState } from "react";
+import { serializePaletteColor } from "../host/serializePalette";
 import { calculateLightenRatio } from "../util/calculateLightenRatio";
 import { ColorSpaceName } from "../util/ColorSpace";
 import { formatPercentage } from "../util/formatPercentage";
 import { generateStops } from "../util/generateStops";
+import { MessageType } from "../util/messages";
 import { PaletteColor } from "../util/PaletteColor";
+import { sendToHost } from "../util/sendToHost";
 import { AdjustColor } from "./AdjustColor";
 import { ColorPlot } from "./ColorPlot";
 import { ComponentSlider } from "./ComponentSlider";
@@ -20,6 +23,7 @@ enum ColorTab {
   Stops,
   Color,
   Options,
+  Draw,
 }
 
 export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
@@ -56,6 +60,13 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
     );
   }, [addStop950, addStop990, adjustEnabled, center, lightenRatio]);
 
+  function drawChips() {
+    sendToHost({
+      type: MessageType.DrawChips,
+      color: serializePaletteColor(color),
+    });
+  }
+
   return (
     <div className="box-modal bg-default stack-col">
       <div className="stack-row bb py-md px-lg col-gap-xl">
@@ -83,6 +94,14 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
         >
           Options
         </div>
+        <div
+          className={clsx("clickable", {
+            "type-color-minor": selectedTab !== ColorTab.Draw,
+          })}
+          onClick={() => selectTab(ColorTab.Draw)}
+        >
+          Draw
+        </div>
       </div>
       {selectedTab === ColorTab.Stops ? (
         <div className="grow-1 p-lg stack-col stack-wrap bb row-gap-sm col-gap-sm basis-0">
@@ -98,6 +117,20 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
                 <div>{stop.hex()}</div>
               </div>
             ))}
+        </div>
+      ) : selectedTab === ColorTab.Draw ? (
+        <div className="grow-1 p-lg stack-col bb row-gap-sm col-gap-sm basis-0">
+          <div>
+            You can use this tool to draw paint chips on to your canvas.
+          </div>
+          <div className="stack-row stack-row-center stack-col-center">
+            <div
+              className="px-lg py-md bg-hover clickable type-bold"
+              onClick={drawChips}
+            >
+              Draw chips
+            </div>
+          </div>
         </div>
       ) : !adjustEnabled ? (
         <div className="grow-1 p-lg stack-col row-gap-lg bb">

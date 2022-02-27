@@ -1,4 +1,5 @@
 import { Message, MessageType } from "../util/messages";
+import { drawChipsCommand } from "./drawChipsCommand";
 import { getPaletteCommand } from "./getPaletteCommand";
 import { updatePaletteCommand } from "./updatePaletteCommand";
 
@@ -9,6 +10,10 @@ figma.showUI(__html__, {
 
 figma.ui.onmessage = (msg: Message) => {
   switch (msg.type) {
+    case MessageType.DrawChips:
+      drawChipsCommand(msg.color);
+      break;
+
     case MessageType.RequestPalette:
       getPaletteCommand();
       break;
