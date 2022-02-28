@@ -29,7 +29,6 @@ export interface SendPaletteMessage {
 export interface UpdatePaletteMessage {
   type: MessageType.UpdatePalette;
   delete?: string[];
-  name: string;
   update?: PaletteColor<string>;
 }
 

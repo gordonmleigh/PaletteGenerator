@@ -4,7 +4,7 @@ import { getPaletteCommand } from "./getPaletteCommand";
 import { updatePaletteCommand } from "./updatePaletteCommand";
 
 figma.showUI(__html__, {
-  height: 30 * 16,
+  height: 32 * 16,
   width: 30 * 16,
 });
 

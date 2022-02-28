@@ -8,7 +8,7 @@ export function updatePaletteCommand(msg: UpdatePaletteMessage) {
 
   if (msg.delete) {
     for (const deleteKey of msg.delete) {
-      const style = styles.find((x) => x.name === `${msg.name}/${deleteKey}`);
+      const style = styles.find((x) => x.name === deleteKey);
       style?.remove();
     }
   }

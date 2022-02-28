@@ -1,4 +1,3 @@
-import Color from "color";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { GenerateModal } from "./components/GenerateModal";
@@ -32,20 +31,21 @@ function App() {
     });
   }, []);
 
-  function save(color: PaletteColor, newStops: Record<string, Color>) {
+  function save(prev: PaletteColor | undefined, next: PaletteColor) {
     const deletes: string[] = [];
 
-    for (const key in color.stops) {
-      if (!newStops[key]) {
-        deletes.push(key);
+    if (prev) {
+      for (const key in prev.stops) {
+        if (next.name !== prev.name || !next.stops[key]) {
+          deletes.push(`${prev.name}.${key}`);
+        }
       }
     }
 
     sendToHost({
       type: MessageType.UpdatePalette,
       delete: deletes,
-      name: color.name,
-      update: serializePaletteColor({ ...color, stops: newStops }),
+      update: serializePaletteColor(next),
     });
     setSelectedColor(undefined);
   }
@@ -99,7 +99,7 @@ function App() {
         <GenerateModal
           color={palette.colors[selectedColor]}
           onCancel={() => setSelectedColor(undefined)}
-          onSave={(stops) => save(palette.colors[selectedColor], stops)}
+          onSave={(next) => save(palette.colors[selectedColor], next)}
         />
       )}
     </>

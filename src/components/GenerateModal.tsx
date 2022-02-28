@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import Color from "color";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { serializePaletteColor } from "../host/serializePalette";
 import { calculateLightenRatio } from "../util/calculateLightenRatio";
 import { ColorSpaceName } from "../util/ColorSpace";
@@ -9,6 +9,7 @@ import { generateStops } from "../util/generateStops";
 import { MessageType } from "../util/messages";
 import { PaletteColor } from "../util/PaletteColor";
 import { sendToHost } from "../util/sendToHost";
+import { tryParseColor } from "../util/tryParseColor";
 import { AdjustColor } from "./AdjustColor";
 import { ColorPlot } from "./ColorPlot";
 import { ComponentSlider } from "./ComponentSlider";
@@ -16,7 +17,7 @@ import { ComponentSlider } from "./ComponentSlider";
 export interface GenerateModalProps {
   color: PaletteColor;
   onCancel: () => void;
-  onSave: (stops: Record<string, Color>) => void;
+  onSave: (color: PaletteColor) => void;
 }
 
 enum ColorTab {
@@ -26,49 +27,148 @@ enum ColorTab {
   Draw,
 }
 
+interface ColorStopState {
+  key: string;
+  value: Color;
+}
+
+interface GenerateModalState {
+  addStop950: boolean;
+  addStop990: boolean;
+  adjustEnabled: boolean;
+  center: Color;
+  centerText: string;
+  lightenRatio: number;
+  name: string;
+  stops: ColorStopState[];
+}
+
+type GenerateModalAction =
+  | { type: "reinit"; color: PaletteColor }
+  | { type: "setCenter"; value: Color }
+  | { type: "setCenterText"; value: string }
+  | {
+      type: "setGenerateOptions";
+      addStop950?: boolean;
+      addStop990?: boolean;
+      adjustEnabled?: boolean;
+      lightenRatio?: number;
+    }
+  | { type: "setName"; name: string };
+
 export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
-  const [adjustEnabled, setAdjustEnabled] = useState(false);
-  const [lightenRatio, setLightenRatio] = useState(
-    () => color.meta?.lightenRatio ?? calculateLightenRatio(color) ?? 1
-  );
-  const [addStop950, setAddStop950] = useState(!!color.stops["950"]);
-  const [addStop990, setAddStop990] = useState(!!color.stops["990"]);
   const [hsv, setHsv] = useState(true);
-  const [stops, setStops] = useState<Record<string, Color>>(color.stops ?? {});
   const [selectedTab, selectTab] = useState(ColorTab.Stops);
   const [colorMode, setColorMode] = useState<ColorSpaceName>("rgb");
-  const [center, setCenter] = useState(color.center);
 
-  const sortedStops = useMemo(
-    () =>
-      Object.entries(stops)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([, v]) => v),
-    [stops]
-  );
+  const [
+    {
+      addStop950,
+      addStop990,
+      adjustEnabled,
+      center,
+      centerText,
+      lightenRatio,
+      name,
+      stops,
+    },
+    dispatch,
+  ] = useReducer(reducer, color, (color) => ({
+    addStop950: !!color.stops["950"],
+    addStop990: !!color.stops["950"],
+    adjustEnabled: false,
+    center: color.center,
+    centerText: color.center.hex(),
+    lightenRatio: color.meta?.lightenRatio ?? calculateLightenRatio(color) ?? 1,
+    name: color.name,
+    stops: stopsToArray(color.stops),
+  }));
 
   useEffect(() => {
-    if (!adjustEnabled) {
-      return;
-    }
-    setStops(
-      generateStops(center, {
-        addStop950,
-        addStop990,
-        lightenRatio,
-      })
-    );
-  }, [addStop950, addStop990, adjustEnabled, center, lightenRatio]);
+    dispatch({
+      type: "reinit",
+      color,
+    });
+  }, [color]);
+
+  const handleSave = useCallback(() => {
+    onSave({
+      center,
+      meta: { lightenRatio },
+      name,
+      stops: stopsFromArray(stops),
+    });
+  }, [onSave]);
+
+  const setCenter = useCallback((value: Color) => {
+    dispatch({
+      type: "setCenter",
+      value,
+    });
+  }, []);
+
+  const setCenterText = useCallback((value: string) => {
+    dispatch({
+      type: "setCenterText",
+      value,
+    });
+  }, []);
+
+  const setGenerateOptions = useCallback(
+    (value: {
+      addStop950?: boolean;
+      addStop990?: boolean;
+      adjustEnabled?: boolean;
+      lightenRatio?: number;
+    }) => {
+      dispatch({
+        type: "setGenerateOptions",
+        ...value,
+      });
+    },
+    []
+  );
+
+  const setName = useCallback((name: string) => {
+    dispatch({
+      type: "setName",
+      name,
+    });
+  }, []);
 
   function drawChips() {
     sendToHost({
       type: MessageType.DrawChips,
-      color: serializePaletteColor(color),
+      color: serializePaletteColor({
+        ...color,
+        center,
+        stops: stopsFromArray(stops),
+      }),
     });
   }
 
   return (
     <div className="box-modal bg-default stack-col">
+      <div className="stack-row bb p-lg col-gap-lg stack-row-center">
+        <div
+          className="square-hg"
+          style={{ backgroundColor: center.toString() }}
+        />
+        <div className="stack-col row-gap-sm">
+          <input
+            type="text"
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Colour name"
+            value={name}
+          />
+          <input
+            type="text"
+            onChange={(e) => setCenterText(e.target.value)}
+            placeholder="Center colour"
+            value={centerText}
+          />
+        </div>
+      </div>
       <div className="stack-row bb py-md px-lg col-gap-xl">
         <div
           className={clsx("clickable", {
@@ -105,18 +205,16 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
       </div>
       {selectedTab === ColorTab.Stops ? (
         <div className="grow-1 p-lg stack-col stack-wrap bb row-gap-sm col-gap-sm basis-0">
-          {Object.entries(stops)
-            .sort(([a], [b]) => a.localeCompare(b))
-            .map(([key, stop]) => (
-              <div className="stack-row col-gap-md stack-row-center" key={key}>
-                <div className="type-color-minor w-xl type-right">{key}</div>
-                <div
-                  className="square-lg"
-                  style={{ backgroundColor: stop.toString() }}
-                />
-                <div>{stop.hex()}</div>
-              </div>
-            ))}
+          {stops.map(({ key, value: stop }) => (
+            <div className="stack-row col-gap-md stack-row-center" key={key}>
+              <div className="type-color-minor w-xl type-right">{key}</div>
+              <div
+                className="square-lg"
+                style={{ backgroundColor: stop.toString() }}
+              />
+              <div>{stop.hex()}</div>
+            </div>
+          ))}
         </div>
       ) : selectedTab === ColorTab.Draw ? (
         <div className="grow-1 p-lg stack-col bb row-gap-sm col-gap-sm basis-0">
@@ -144,7 +242,9 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
               id="enableAdjust"
               type="checkbox"
               checked={adjustEnabled}
-              onChange={(e) => setAdjustEnabled(e.target.checked)}
+              onChange={(e) =>
+                setGenerateOptions({ adjustEnabled: e.target.checked })
+              }
             />
             <label className="clickable" htmlFor="enableAdjust">
               Enable
@@ -194,7 +294,7 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
               label="Lighten ratio"
               max={1}
               min={0}
-              onChange={setLightenRatio}
+              onChange={(lightenRatio) => setGenerateOptions({ lightenRatio })}
               step={0.01}
               value={lightenRatio}
             />
@@ -204,7 +304,9 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
                 id="stop95"
                 type="checkbox"
                 checked={addStop950}
-                onChange={(e) => setAddStop950(e.target.checked)}
+                onChange={(e) =>
+                  setGenerateOptions({ addStop950: e.target.checked })
+                }
               />
               <label className="clickable" htmlFor="stop95">
                 Include stop 950
@@ -216,7 +318,9 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
                 id="stop99"
                 type="checkbox"
                 checked={addStop990}
-                onChange={(e) => setAddStop990(e.target.checked)}
+                onChange={(e) =>
+                  setGenerateOptions({ addStop990: e.target.checked })
+                }
               />
               <label className="clickable" htmlFor="stop99">
                 Include stop 990
@@ -250,12 +354,12 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
             height={128}
             width={192}
             mode={hsv ? "hsv" : "hsl"}
-            colors={sortedStops}
+            colors={stops.map(({ value }) => value)}
           />
           <div className="grow-1 shrink-0 basis-0"></div>
         </div>
         <div className="stack-row stack-row-center stack-col-center shrink-0">
-          {sortedStops.map((x, i) => (
+          {stops.map((x, i) => (
             <div
               key={`color-${i}`}
               className="square-xl"
@@ -273,11 +377,85 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
         </button>
         <button
           className="shrink-1 stack-row stack-align-center p-lg clickable bg-hover"
-          onClick={() => onSave(stops)}
+          onClick={handleSave}
         >
           Save
         </button>
       </div>
     </div>
   );
+}
+
+function reducer(
+  state: GenerateModalState,
+  action: GenerateModalAction
+): GenerateModalState {
+  switch (action.type) {
+    case "reinit":
+      return {
+        ...state,
+        center: action.color.center,
+        centerText: action.color.center.hex(),
+        lightenRatio:
+          action.color.meta?.lightenRatio ??
+          calculateLightenRatio(action.color) ??
+          1,
+        name: action.color.name,
+        stops: stopsToArray(action.color.stops),
+      };
+
+    case "setCenter":
+      return updateColorStops({
+        ...state,
+        adjustEnabled: true,
+        center: action.value,
+        centerText: action.value.hex(),
+      });
+
+    case "setCenterText":
+      return updateColorStops({
+        ...state,
+        adjustEnabled: true,
+        center: tryParseColor(action.value) ?? state.center,
+        centerText: action.value,
+      });
+
+    case "setGenerateOptions":
+      return updateColorStops({
+        ...state,
+        addStop950: action.addStop950 ?? state.addStop950,
+        addStop990: action.addStop990 ?? state.addStop990,
+        adjustEnabled: action.adjustEnabled ?? state.adjustEnabled,
+        lightenRatio: action.lightenRatio ?? state.lightenRatio,
+      });
+
+    case "setName":
+      return {
+        ...state,
+        name: action.name,
+      };
+  }
+  return state;
+}
+
+function updateColorStops(state: GenerateModalState): GenerateModalState {
+  if (state.adjustEnabled) {
+    const stops = generateStops(state.center, {
+      addStop950: state.addStop950,
+      addStop990: state.addStop990,
+      lightenRatio: state.lightenRatio,
+    });
+    state.stops = stopsToArray(stops);
+  }
+  return state;
+}
+
+function stopsToArray(stops: Record<string, Color>): ColorStopState[] {
+  const array = Object.entries(stops);
+  array.sort(([a], [b]) => a.localeCompare(b));
+  return array.map(([key, value]) => ({ key, value }));
+}
+
+function stopsFromArray(stops: ColorStopState[]): Record<string, Color> {
+  return Object.fromEntries(stops.map(({ key, value }) => [key, value]));
 }

@@ -3,7 +3,7 @@ import { PaletteColorMetadata } from "./PaletteColorMetadata";
 
 export interface PaletteColor<ColorType = Color> {
   center: ColorType;
-  meta: PaletteColorMetadata;
+  meta?: PaletteColorMetadata;
   name: string;
   stops: Record<string, ColorType>;
 }
