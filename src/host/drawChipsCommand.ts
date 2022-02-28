@@ -1,9 +1,11 @@
 import { PaletteColor } from "../util/PaletteColor";
-import { createOrUpdatePaintStyle } from "./createOrUpdatePaintStyle";
+import { rgbFromCss } from "../util/rgbFromCss";
+import { PaintStyles } from "./PaintStyles";
 
 export async function drawChipsCommand(
   color: PaletteColor<string>
 ): Promise<void> {
+  const styles = new PaintStyles();
   let fontLoaded = false;
 
   const stops = Object.entries(color.stops).sort(([a], [b]) =>
@@ -28,8 +30,14 @@ export async function drawChipsCommand(
     chipContainer.itemSpacing = 4;
     container.appendChild(chipContainer);
 
-    const style = createOrUpdatePaintStyle(`${color.name}/${stop}`, [value], {
-      noUpdate: true,
+    const style = styles.getOrCreate(`${color.name}/${stop}`, {
+      init: (style) =>
+        (style.paints = [
+          {
+            type: "SOLID",
+            color: rgbFromCss(value),
+          },
+        ]),
     });
 
     const chip = figma.createRectangle();

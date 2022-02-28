@@ -98,7 +98,7 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
       name,
       stops: stopsFromArray(stops),
     });
-  }, [onSave]);
+  }, [center, lightenRatio, name, onSave, stops]);
 
   const setCenter = useCallback((value: Color) => {
     dispatch({

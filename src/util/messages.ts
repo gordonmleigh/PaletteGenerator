@@ -28,8 +28,8 @@ export interface SendPaletteMessage {
 
 export interface UpdatePaletteMessage {
   type: MessageType.UpdatePalette;
-  delete?: string[];
-  update?: PaletteColor<string>;
+  prev?: PaletteColor<string>;
+  next?: PaletteColor<string>;
 }
 
 export type Message =

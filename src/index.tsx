@@ -32,20 +32,10 @@ function App() {
   }, []);
 
   function save(prev: PaletteColor | undefined, next: PaletteColor) {
-    const deletes: string[] = [];
-
-    if (prev) {
-      for (const key in prev.stops) {
-        if (next.name !== prev.name || !next.stops[key]) {
-          deletes.push(`${prev.name}.${key}`);
-        }
-      }
-    }
-
     sendToHost({
       type: MessageType.UpdatePalette,
-      delete: deletes,
-      update: serializePaletteColor(next),
+      prev: prev && serializePaletteColor(prev),
+      next: serializePaletteColor(next),
     });
     setSelectedColor(undefined);
   }

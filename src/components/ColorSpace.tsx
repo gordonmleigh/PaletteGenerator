@@ -38,7 +38,6 @@ export function ColorSpace({
   useEventListener("resize", () => measure());
 
   useLayoutEffect(() => {
-    console.log(`render %o %d %d %d`, !!canvasRef, height, width, hue);
     if (!canvasRef || !height || !width) {
       return;
     }

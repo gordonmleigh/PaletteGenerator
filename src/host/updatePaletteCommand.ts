@@ -1,19 +1,24 @@
 import { UpdatePaletteMessage } from "../util/messages";
 import { getPaletteCommand } from "./getPaletteCommand";
+import { PaintStyles } from "./PaintStyles";
 import { deserializePaletteColor } from "./serializePalette";
-import { updatePaletteStyles } from "./updatePaletteStyles";
 
 export function updatePaletteCommand(msg: UpdatePaletteMessage) {
-  const styles = figma.getLocalPaintStyles();
+  const styles = new PaintStyles();
+  const { prev, next } = msg;
 
-  if (msg.delete) {
-    for (const deleteKey of msg.delete) {
-      const style = styles.find((x) => x.name === deleteKey);
-      style?.remove();
+  if (prev) {
+    for (const deleteKey in prev.stops) {
+      if (!msg.next || !(deleteKey in msg.next.stops)) {
+        styles.delete(`${prev.name}/${deleteKey}`);
+      }
     }
   }
-  if (msg.update) {
-    updatePaletteStyles(deserializePaletteColor(msg.update));
+  if (prev && next && prev.name !== next.name) {
+    styles.renameGroup(prev.name, next.name);
+  }
+  if (next) {
+    styles.updateColor(deserializePaletteColor(next));
   }
   getPaletteCommand();
 }

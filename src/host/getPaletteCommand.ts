@@ -1,11 +1,11 @@
 import { MessageType } from "../util/messages";
 import { sendToUI } from "../util/sendToUI";
-import { getPaletteStyles } from "./getPaletteStyles";
+import { PaintStyles } from "./PaintStyles";
 import { serializePalette } from "./serializePalette";
 
 export function getPaletteCommand() {
   sendToUI({
     type: MessageType.SendPalette,
-    palette: serializePalette(getPaletteStyles()),
+    palette: serializePalette(new PaintStyles().getPalette()),
   });
 }
