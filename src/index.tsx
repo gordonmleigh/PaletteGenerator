@@ -35,11 +35,14 @@ function App() {
     refresh();
   }, [refresh]);
 
-  function save(prev: PaletteColor | undefined, next: PaletteColor) {
+  function save(
+    prev: PaletteColor | undefined,
+    next: PaletteColor | undefined
+  ) {
     sendToHost({
       type: MessageType.UpdatePalette,
       prev: prev && serializePaletteColor(prev),
-      next: serializePaletteColor(next),
+      next: next && serializePaletteColor(next),
     });
     setSelectedColor(undefined);
   }
@@ -109,6 +112,7 @@ function App() {
         <GenerateModal
           color={palette.colors[selectedColor]}
           onCancel={() => setSelectedColor(undefined)}
+          onDelete={() => save(palette.colors[selectedColor], undefined)}
           onSave={(next) => save(palette.colors[selectedColor], next)}
         />
       )}

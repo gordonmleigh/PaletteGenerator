@@ -8,9 +8,9 @@ export function updatePaletteCommand(msg: UpdatePaletteMessage) {
   const { prev, next } = msg;
 
   if (prev) {
-    for (const deleteKey in prev.stops) {
-      if (!msg.next || !(deleteKey in msg.next.stops)) {
-        styles.delete(`${prev.name}/${deleteKey}`);
+    for (const stop in prev.stops) {
+      if (!msg.next || !(stop in msg.next.stops)) {
+        styles.delete(`${prev.name}/${stop}`);
       }
     }
   }

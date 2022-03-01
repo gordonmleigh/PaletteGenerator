@@ -36,6 +36,10 @@
   background-color: v.$hover-bg-color;
 }
 
+.bg-hover-danger:hover {
+  background-color: v.$bg-color-danger;
+}
+
 .bt {
   border-top: solid 1px v.$border-color;
 }

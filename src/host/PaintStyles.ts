@@ -38,7 +38,11 @@ export class PaintStyles {
   }
 
   public delete(name: string): void {
-    this.get(name)?.remove();
+    const index = this.styles.findIndex((x) => x.name === name);
+    if (index < 0) {
+      return;
+    }
+    this.styles.splice(index, 1)[0].remove();
   }
 
   public getOrCreate(

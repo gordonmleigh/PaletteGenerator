@@ -17,6 +17,7 @@ import { ComponentSlider } from "./ComponentSlider";
 export interface GenerateModalProps {
   color?: PaletteColor;
   onCancel: () => void;
+  onDelete: () => void;
   onSave: (color: PaletteColor) => void;
 }
 
@@ -56,12 +57,18 @@ type GenerateModalAction =
     }
   | { type: "setName"; name: string };
 
-export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
+export function GenerateModal({
+  color,
+  onCancel,
+  onDelete,
+  onSave,
+}: GenerateModalProps) {
   const [hsv, setHsv] = useState(true);
   const [selectedTab, selectTab] = useState(
     color ? ColorTab.Stops : ColorTab.Color
   );
   const [colorMode, setColorMode] = useState<ColorSpaceName>("rgb");
+  const [deleting, setDeleting] = useState(false);
 
   const [
     {
@@ -178,6 +185,32 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
             placeholder="Center colour"
             value={centerText}
           />
+        </div>
+        <div className="basis-0 grow-1"></div>
+        <div className="stack-row col-gap-sm">
+          {deleting ? (
+            <>
+              <div
+                className="px-lg py-md bg-hover-danger clickable type-bold type-color-danger"
+                onClick={onDelete}
+              >
+                Confirm delete
+              </div>
+              <div
+                className="px-lg py-md bg-hover clickable"
+                onClick={() => setDeleting(false)}
+              >
+                Cancel
+              </div>
+            </>
+          ) : (
+            <div
+              className="px-lg py-md bg-hover-danger clickable type-bold type-color-danger"
+              onClick={() => setDeleting(true)}
+            >
+              Delete
+            </div>
+          )}
         </div>
       </div>
       <div className="stack-row bb py-md px-lg col-gap-xl">
