@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { GenerateModal } from "./components/GenerateModal";
 import { useEventListener } from "./hooks/useEventListener";
@@ -25,11 +25,15 @@ function App() {
     }
   });
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
     sendToHost({
       type: MessageType.RequestPalette,
     });
   }, []);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   function save(prev: PaletteColor | undefined, next: PaletteColor) {
     sendToHost({
@@ -42,48 +46,64 @@ function App() {
 
   return (
     <>
-      <div className="box-modal box-scroll-y stack-col py-md">
-        {palette &&
-          palette.colors.map(({ name, stops: stopMap, center }, i) => {
-            const stops = Object.entries(stopMap);
-            const stopCount =
-              stops.length === 1 ? `1 stop` : `${stops.length} stops`;
+      <div className="box-modal stack-col">
+        <div className="box-scroll-y stack-grow-1 stack-col py-md">
+          {palette &&
+            palette.colors.map(({ name, stops: stopMap, center }, i) => {
+              const stops = Object.entries(stopMap);
+              const stopCount =
+                stops.length === 1 ? `1 stop` : `${stops.length} stops`;
 
-            return (
-              <div
-                key={name}
-                className="stack-row col-gap-md p-md px-lg bg-hover clickable"
-                onClick={() => setSelectedColor(i)}
-              >
+              return (
                 <div
-                  className="square-hg grow-0 shrink-0"
-                  style={{ backgroundColor: center.toString() }}
-                />
-                <div className="stack-col stack-equal-lengths">
-                  <div className="stack-row">
-                    {stops
-                      .sort(([a], [b]) =>
-                        a.padStart(5, "0").localeCompare(b.padStart(5, "0"))
-                      )
-                      .map(([key, stop]) => (
-                        <div
-                          className="square-md"
-                          key={key}
-                          style={{ backgroundColor: stop.toString() }}
-                        ></div>
-                      ))}
-                  </div>
-                  <div className="stack-row stack-col-center col-gap-sm">
-                    <div>{name}</div>
-                    <div className="type-color-minor">({stopCount})</div>
-                  </div>
-                  <div className="stack-row stack-align-center">
-                    {center.hex().toString()}
+                  key={name}
+                  className="stack-row col-gap-md p-md px-lg bg-hover clickable"
+                  onClick={() => setSelectedColor(i)}
+                >
+                  <div
+                    className="square-hg grow-0 shrink-0"
+                    style={{ backgroundColor: center.toString() }}
+                  />
+                  <div className="stack-col stack-equal-lengths">
+                    <div className="stack-row">
+                      {stops
+                        .sort(([a], [b]) =>
+                          a.padStart(5, "0").localeCompare(b.padStart(5, "0"))
+                        )
+                        .map(([key, stop]) => (
+                          <div
+                            className="square-md"
+                            key={key}
+                            style={{ backgroundColor: stop.toString() }}
+                          ></div>
+                        ))}
+                    </div>
+                    <div className="stack-row stack-col-center col-gap-sm">
+                      <div>{name}</div>
+                      <div className="type-color-minor">({stopCount})</div>
+                    </div>
+                    <div className="stack-row stack-align-center">
+                      {center.hex().toString()}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+        </div>
+        <div className="stack-row shrink-0 stack-col-space-between bt">
+          <button
+            className="shrink-1 stack-row stack-align-center p-lg clickable bg-hover"
+            onClick={refresh}
+          >
+            Refresh
+          </button>
+          <button
+            className="shrink-1 stack-row stack-align-center p-lg clickable bg-hover"
+            onClick={() => setSelectedColor(Number.POSITIVE_INFINITY)}
+          >
+            Add
+          </button>
+        </div>
       </div>
       {palette && selectedColor !== undefined && (
         <GenerateModal

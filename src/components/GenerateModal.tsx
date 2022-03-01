@@ -15,7 +15,7 @@ import { ColorPlot } from "./ColorPlot";
 import { ComponentSlider } from "./ComponentSlider";
 
 export interface GenerateModalProps {
-  color: PaletteColor;
+  color?: PaletteColor;
   onCancel: () => void;
   onSave: (color: PaletteColor) => void;
 }
@@ -58,7 +58,9 @@ type GenerateModalAction =
 
 export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
   const [hsv, setHsv] = useState(true);
-  const [selectedTab, selectTab] = useState(ColorTab.Stops);
+  const [selectedTab, selectTab] = useState(
+    color ? ColorTab.Stops : ColorTab.Color
+  );
   const [colorMode, setColorMode] = useState<ColorSpaceName>("rgb");
 
   const [
@@ -73,25 +75,31 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
       stops,
     },
     dispatch,
-  ] = useReducer(reducer, color, (color) => ({
-    addStop950: !!color.stops["950"],
-    addStop990: !!color.stops["950"],
-    adjustEnabled: false,
-    center: color.center,
-    centerText: color.center.hex(),
-    lightenRatio: color.meta?.lightenRatio ?? calculateLightenRatio(color) ?? 1,
-    name: color.name,
-    stops: stopsToArray(color.stops),
+  ] = useReducer(reducer, color as any, (color) => ({
+    addStop950: color ? !!color.stops["950"] : true,
+    addStop990: color ? !!color.stops["950"] : true,
+    adjustEnabled: !color,
+    center: color?.center ?? Color(),
+    centerText: (color?.center ?? Color()).hex(),
+    lightenRatio:
+      color?.meta?.lightenRatio ?? (color && calculateLightenRatio(color)) ?? 1,
+    name: color?.name,
+    stops: color ? stopsToArray(color.stops) : [],
   }));
 
   useEffect(() => {
-    dispatch({
-      type: "reinit",
-      color,
-    });
+    if (color) {
+      dispatch({
+        type: "reinit",
+        color,
+      });
+    }
   }, [color]);
 
   const handleSave = useCallback(() => {
+    if (!name) {
+      return;
+    }
     onSave({
       center,
       meta: { lightenRatio },
@@ -137,11 +145,14 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
   }, []);
 
   function drawChips() {
+    if (!name) {
+      return;
+    }
     sendToHost({
       type: MessageType.DrawChips,
       color: serializePaletteColor({
-        ...color,
         center,
+        name,
         stops: stopsFromArray(stops),
       }),
     });
@@ -359,11 +370,11 @@ export function GenerateModal({ color, onCancel, onSave }: GenerateModalProps) {
           <div className="grow-1 shrink-0 basis-0"></div>
         </div>
         <div className="stack-row stack-row-center stack-col-center shrink-0">
-          {stops.map((x, i) => (
+          {stops.map(({ value }, i) => (
             <div
               key={`color-${i}`}
               className="square-xl"
-              style={{ backgroundColor: x.toString() }}
+              style={{ backgroundColor: value.toString() }}
             />
           ))}
         </div>
