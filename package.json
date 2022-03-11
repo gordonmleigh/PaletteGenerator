@@ -1,15 +1,14 @@
 {
-  "name": "PaletteGenerator",
-  "version": "1.0.0",
-  "description": "Your Figma plugin",
-  "main": "code.js",
+  "name": "figma-style-tools",
+  "version": "0.1.0",
+  "description": "Style management plugin for figma",
   "scripts": {
     "build": "webpack --mode=production",
     "build:dev": "webpack",
     "watch": "webpack -w"
   },
-  "author": "",
-  "license": "",
+  "author": "Gordon Leigh",
+  "license": "UNLICENSED",
   "devDependencies": {
     "@babel/core": "^7.17.5",
     "@babel/preset-env": "^7.16.11",
