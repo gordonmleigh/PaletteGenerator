@@ -3,6 +3,10 @@ const HtmlInlineScriptPlugin = require("html-inline-script-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const postcssNormalize = require("postcss-normalize");
+const { DefinePlugin } = require("webpack");
+
+const BROWSERS =
+  "last 5 chrome versions, last 5 firefox versions, last 1 safari major version";
 
 module.exports = (env, argv) => {
   const isEnvProduction = argv.mode === "production";
@@ -15,8 +19,7 @@ module.exports = (env, argv) => {
     devtool: isEnvDevelopment && "inline-source-map",
 
     entry: {
-      ui: ["regenerator-runtime/runtime", "./src/index.tsx"],
-      plugin: ["regenerator-runtime/runtime", "./src/host/index.ts"],
+      ui: ["./src/index.tsx"],
     },
 
     module: {
@@ -29,7 +32,12 @@ module.exports = (env, argv) => {
                 loader: "babel-loader",
                 options: {
                   presets: [
-                    "@babel/preset-env",
+                    [
+                      "@babel/preset-env",
+                      {
+                        targets: BROWSERS,
+                      },
+                    ],
                     "@babel/preset-react",
                     "@babel/preset-typescript",
                   ],
@@ -62,6 +70,7 @@ module.exports = (env, argv) => {
                           autoprefixer: {
                             flexbox: "no-2009",
                           },
+                          browsers: BROWSERS,
                           stage: 3,
                         }),
                         // Adds PostCSS Normalize as the reset css with default options,
@@ -121,6 +130,11 @@ module.exports = (env, argv) => {
         filename: "./ui.html",
         inject: "body",
         template: "./src/ui.html",
+      }),
+      new DefinePlugin({
+        "process.env.NODE_ENV": JSON.stringify(
+          isEnvProduction ? "production" : "debug"
+        ),
       }),
       new HtmlInlineScriptPlugin([/^ui\.js$/]),
     ],
