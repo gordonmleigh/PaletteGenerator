@@ -1,3 +1,4 @@
+import "regenerator-runtime/runtime";
 import { Message, MessageType } from "../util/messages";
 import { drawChipsCommand } from "./drawChipsCommand";
 import { getPaletteCommand } from "./getPaletteCommand";
