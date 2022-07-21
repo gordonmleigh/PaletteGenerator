@@ -26,6 +26,7 @@ enum ColorTab {
   Color,
   Options,
   Draw,
+  Css,
 }
 
 interface ColorStopState {
@@ -246,6 +247,14 @@ export function GenerateModal({
         >
           Draw
         </div>
+        <div
+          className={clsx("clickable", {
+            "type-color-minor": selectedTab !== ColorTab.Css,
+          })}
+          onClick={() => selectTab(ColorTab.Css)}
+        >
+          CSS
+        </div>
       </div>
       {selectedTab === ColorTab.Stops ? (
         <div className="grow-1 p-lg stack-col stack-wrap bb row-gap-sm col-gap-sm basis-0">
@@ -273,6 +282,12 @@ export function GenerateModal({
               Draw chips
             </div>
           </div>
+        </div>
+      ) : selectedTab === ColorTab.Css ? (
+        <div className="grow-1 p-lg stack-col bb row-gap-sm col-gap-sm basis-0 box-scroll-y">
+          <pre>
+            {stops.map((x) => `--color-${x.key}: ${x.value.hex()};`).join("\n")}
+          </pre>
         </div>
       ) : !adjustEnabled ? (
         <div className="grow-1 p-lg stack-col row-gap-lg bb">
