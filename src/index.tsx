@@ -50,7 +50,7 @@ function App() {
   return (
     <>
       <div className="box-modal stack-col">
-        <div className="box-scroll-y stack-grow-1 stack-col py-md">
+        <div className="box-scroll-y grow-1 stack-col py-md">
           {palette &&
             palette.colors.map(({ name, stops: stopMap, center }, i) => {
               const stops = Object.entries(stopMap);

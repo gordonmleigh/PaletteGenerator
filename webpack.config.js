@@ -131,11 +131,7 @@ module.exports = (env, argv) => {
         inject: "body",
         template: "./src/ui.html",
       }),
-      new DefinePlugin({
-        "process.env.NODE_ENV": JSON.stringify(
-          isEnvProduction ? "production" : "debug"
-        ),
-      }),
+      new DefinePlugin({}),
       new HtmlInlineScriptPlugin([/^ui\.js$/]),
     ],
   };

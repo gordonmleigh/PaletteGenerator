@@ -449,6 +449,7 @@ function reducer(
   state: GenerateModalState,
   action: GenerateModalAction
 ): GenerateModalState {
+  console.trace(`dispatch %o`, action);
   switch (action.type) {
     case "reinit":
       return {
@@ -468,7 +469,10 @@ function reducer(
         ...state,
         adjustEnabled: true,
         center: action.value,
-        centerText: action.value.hex(),
+        centerText:
+          tryParseColor(state.centerText)?.hex() === action.value.hex()
+            ? state.centerText
+            : action.value.hex(),
       });
 
     case "setCenterText":
